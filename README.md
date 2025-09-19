@@ -1,4 +1,7 @@
 # Task Management System – Documentation
+Note: 
+Frontend: /task-dashboard
+Backend: /api
 
 1. Setup Instructions
    --Prerequisites
@@ -30,10 +33,11 @@ DB_NAME=task_management
 Install node_modules
 
 Running the Apps
+Run the app from the root folder; don't go into the api folder or task-dashboard folder
 
 # Backend (NestJS)
 
-nx serve api\
+nx serve api
 
 # Frontend (Angular)
 

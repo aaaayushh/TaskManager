@@ -3,7 +3,7 @@ Note:
 Frontend: /task-dashboard
 Backend: /api
 
-##1. Setup Instructions
+## 1. Setup Instructions
    --Prerequisites
 
 Node.js ≥ 18
@@ -108,52 +108,51 @@ Could be used for dynamic permission checks instead of relying solely on hardcod
 
 ### ERD Diagram
 
-┌───────────────────────────┐
-│ ORGANIZATION              │
-├───────────────────────────┤
-│ id (PK)                   │
-│ name │
-│ parentId (FK → Org.id)    │
-├───────────────────────────┤
-│ 1 ──< children            │
-│ 1 ──< users               │
-│ 1 ──< tasks               │
-└───────────────────────────┘
- ▲
- │ (self-relation)
- ▼
+        ┌───────────────────────────┐
+        │       ORGANIZATION        │
+        ├───────────────────────────┤
+        │ id (PK)                   │
+        │ name                       │
+        │ parentId (FK → Org.id)    │
+        ├───────────────────────────┤
+        │ 1 ──< children            │
+        │ 1 ──< users               │
+        │ 1 ──< tasks               │
+        └───────────────────────────┘
+                 ▲
+                 │ (self-relation)
+                 ▼
+        ┌───────────────────────────┐
+        │           USER            │
+        ├───────────────────────────┤
+        │ id (PK)                   │
+        │ username (unique)         │
+        │ password                  │
+        │ role (Owner/Admin/Viewer) │
+        │ organizationId (FK)       │
+        ├───────────────────────────┤
+        │ 1 ──< tasks               │
+        └───────────────────────────┘
+                 │
+                 ▼
+        ┌───────────────────────────┐
+        │           TASK            │
+        ├───────────────────────────┤
+        │ id (PK)                   │
+        │ title                     │
+        │ description (nullable)    │
+        │ status (Pending/InProgress/Completed) │
+        │ ownerId (FK → User.id)    │
+        └───────────────────────────┘
 
-┌───────────────────────────┐
-│ USER                      │
-├───────────────────────────┤
-│ id (PK)                   │
-│ username (unique)         │
-│ password                  │
-│ role (enum: Owner/Admin/Viewer) │
-│ organizationId (FK)       │
-├───────────────────────────┤
-│ 1 ──< tasks               │
-└───────────────────────────┘
-│
-▼
+        ┌───────────────────────────┐
+        │           ROLE            │
+        ├───────────────────────────┤
+        │ id (PK)                   │
+        │ name (Owner/Admin/Viewer) │
+        │ permissions (string[])    │
+        └───────────────────────────┘
 
-┌───────────────────────────┐
-│ TASK                      │
-├───────────────────────────┤
-│ id (PK)                   │
-│ title                     │
-│ description (nullable)    │
-│ status (enum: Pending/InProgress/Completed) │
-│ ownerId (FK → User.id)    │
-└───────────────────────────┘
-
-┌───────────────────────────┐
-│ ROLE                      │
-├───────────────────────────┤
-│ id (PK)                   │
-│ name (Owner/Admin/Viewer) │
-│ permissions (string[])    │
-└───────────────────────────┘
 
 Organization → User: One-to-Many
 

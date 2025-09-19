@@ -1,0 +1,151 @@
+<div class="min-h-screen p-6 bg-gray-100 dark:bg-gray-900 transition-colors">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Task Dashboard</h2>
+    <div class="flex gap-2">
+      <button (click)="toggleDarkMode()"
+              class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700 dark:bg-gray-200 dark:text-black dark:hover:bg-gray-300 transition-colors">
+        {{ darkMode ? 'Light Mode' : 'Dark Mode' }}
+      </button>
+      <button (click)="logout()"
+              class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">
+        Logout
+      </button>
+    </div>
+  </div>
+
+  <!-- Add Task Component -->
+  <app-add-task (taskAdded)="addTask($event)"></app-add-task>
+
+  <!-- Task Completion Bar Chart -->
+  <div class="my-6 p-4 bg-white dark:bg-gray-800 rounded shadow transition-colors">
+    <h3 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-200">Task Completion Overview</h3>
+    <div class="w-full md:w-2/3 h-64">
+      <canvas baseChart
+              [data]="barChartData"
+              [options]="barChartOptions"
+              chartType="bar">
+      </canvas>
+    </div>
+  </div>
+
+  <!-- Kanban Columns -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+
+    <!-- To-Do Column -->
+    <div class="bg-white dark:bg-gray-800 p-4 rounded shadow transition-colors">
+      <h3 class="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-200">To-Do</h3>
+      <div cdkDropList
+           id="todoList"
+           [cdkDropListData]="todo"
+           [cdkDropListConnectedTo]="['inProgressList','completedList']"
+           (cdkDropListDropped)="drop($event)"
+           class="space-y-4 min-h-[150px]">
+        <div *ngFor="let task of todo" cdkDrag
+             class="p-3 bg-gray-100 dark:bg-gray-700 rounded shadow flex flex-col cursor-move hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+
+          <!-- View Mode -->
+          <div *ngIf="!task.isEditing" class="flex justify-between items-start">
+            <div class="flex-1">
+              <span (click)="startEdit(task)" class="cursor-pointer font-semibold text-gray-800 dark:text-gray-100">{{ task.title }}</span>
+              <div class="text-gray-600 dark:text-gray-300 text-sm mt-1">{{ task.description }}</div>
+            </div>
+            <button (click)="deleteTask(task)" class="text-red-600 hover:text-red-800 font-bold">Delete</button>
+          </div>
+
+          <!-- Edit Mode -->
+          <div *ngIf="task.isEditing" class="flex flex-col gap-2">
+            <input [(ngModel)]="task.title"
+                   (keyup.enter)="saveEdit(task, task.title, task.description)"
+                   class="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <textarea [(ngModel)]="task.description"
+                      (keyup.enter)="saveEdit(task, task.title, task.description)"
+                      class="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Description"></textarea>
+            <button (click)="saveEdit(task, task.title, task.description)"
+                    class="text-green-600 hover:text-green-800 font-bold mt-1">Save</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- In Progress Column -->
+    <div class="bg-white dark:bg-gray-800 p-4 rounded shadow transition-colors">
+      <h3 class="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-200">In Progress</h3>
+      <div cdkDropList
+           id="inProgressList"
+           [cdkDropListData]="inProgress"
+           [cdkDropListConnectedTo]="['todoList','completedList']"
+           (cdkDropListDropped)="drop($event)"
+           class="space-y-4 min-h-[150px]">
+        <div *ngFor="let task of inProgress" cdkDrag
+             class="p-3 bg-yellow-100 dark:bg-yellow-700 rounded shadow flex flex-col cursor-move hover:bg-yellow-200 dark:hover:bg-yellow-600 transition-colors">
+
+          <!-- View Mode -->
+          <div *ngIf="!task.isEditing" class="flex justify-between items-start">
+            <div class="flex-1">
+              <span (click)="startEdit(task)" class="cursor-pointer font-semibold text-gray-800 dark:text-gray-100">{{ task.title }}</span>
+              <div class="text-gray-600 dark:text-gray-300 text-sm mt-1">{{ task.description }}</div>
+            </div>
+            <button (click)="deleteTask(task)" class="text-red-600 hover:text-red-800 font-bold">Delete</button>
+          </div>
+
+          <!-- Edit Mode -->
+          <div *ngIf="task.isEditing" class="flex flex-col gap-2">
+            <input [(ngModel)]="task.title"
+                   (keyup.enter)="saveEdit(task, task.title, task.description)"
+                   class="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <textarea [(ngModel)]="task.description"
+                      (keyup.enter)="saveEdit(task, task.title, task.description)"
+                      class="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Description"></textarea>
+            <button (click)="saveEdit(task, task.title, task.description)"
+                    class="text-green-600 hover:text-green-800 font-bold mt-1">Save</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Completed Column -->
+    <div class="bg-white dark:bg-gray-800 p-4 rounded shadow transition-colors">
+      <h3 class="text-lg font-semibold mb-4 text-gray-700 dark:text-gray-200">Completed</h3>
+      <div cdkDropList
+           id="completedList"
+           [cdkDropListData]="completed"
+           [cdkDropListConnectedTo]="['todoList','inProgressList']"
+           (cdkDropListDropped)="drop($event)"
+           class="space-y-4 min-h-[150px]">
+        <div *ngFor="let task of completed" cdkDrag
+             class="p-3 bg-green-100 dark:bg-green-700 rounded shadow flex flex-col cursor-move hover:bg-green-200 dark:hover:bg-green-600 transition-colors">
+
+          <!-- View Mode -->
+          <div *ngIf="!task.isEditing" class="flex justify-between items-start">
+            <div class="flex-1">
+              <span (click)="startEdit(task)" class="cursor-pointer font-semibold text-gray-800 dark:text-gray-100">{{ task.title }}</span>
+              <div class="text-gray-600 dark:text-gray-300 text-sm mt-1">{{ task.description }}</div>
+            </div>
+            <button (click)="deleteTask(task)" class="text-red-600 hover:text-red-800 font-bold">Delete</button>
+          </div>
+
+          <!-- Edit Mode -->
+          <div *ngIf="task.isEditing" class="flex flex-col gap-2">
+            <input [(ngModel)]="task.title"
+                   (keyup.enter)="saveEdit(task, task.title, task.description)"
+                   class="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <textarea [(ngModel)]="task.description"
+                      (keyup.enter)="saveEdit(task, task.title, task.description)"
+                      class="w-full px-2 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Description"></textarea>
+            <button (click)="saveEdit(task, task.title, task.description)"
+                    class="text-green-600 hover:text-green-800 font-bold mt-1">Save</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -3,7 +3,7 @@ Note:
 Frontend: /task-dashboard
 Backend: /api
 
-1. Setup Instructions
+##1. Setup Instructions
    --Prerequisites
 
 Node.js ≥ 18
@@ -15,14 +15,14 @@ Angular CLI: npm install -g @angular/cli
 Sqlite DB (https://sqlitebrowser.org/dl/)
 Environment Variables (.env)
 
-Create a .env file in the root of your backend project:
+Create a .env file in the root of your backend project
 
-# JWT
+### JWT
 
 JWT_SECRET=your_jwt_secret
 JWT_EXPIRES_IN=1h
 
-# Database
+### Database
 
 DB_HOST=localhost
 DB_PORT=5432
@@ -35,17 +35,17 @@ Install node_modules
 Running the Apps
 Run the app from the root folder; don't go into the api folder or task-dashboard folder
 
-# Backend (NestJS)
+### Backend (NestJS)
 
 nx serve api
 
-# Frontend (Angular)
+### Frontend (Angular)
 
 nx serve task-dashboard
 
 The frontend will run at http://localhost:4200, and the backend at http://localhost:3000.
 
-2. Architecture Overview
+## 2. Architecture Overview
    NX Monorepo Layout
    apps/
    api/ # NestJS backend
@@ -60,9 +60,9 @@ Single repository for both frontend and backend.
 
 Modular structure improves scalability and testability.
 
-3. Data Model
+## 3. Data Model
 
-# Schema Overview
+### Schema Overview
 
 1. Organization
 
@@ -106,53 +106,53 @@ Stores predefined roles (Owner, Admin, Viewer) and their permissions (like task.
 
 Could be used for dynamic permission checks instead of relying solely on hardcoded enum in User.
 
-# ERD Diagram
+### ERD Diagram
 
 ┌───────────────────────────┐
-│ ORGANIZATION │
+│ ORGANIZATION              │
 ├───────────────────────────┤
-│ id (PK) │
+│ id (PK)                   │
 │ name │
-│ parentId (FK → Org.id) │
+│ parentId (FK → Org.id)    │
 ├───────────────────────────┤
-│ 1 ──< children │
-│ 1 ──< users │
-│ 1 ──< tasks │
+│ 1 ──< children            │
+│ 1 ──< users               │
+│ 1 ──< tasks               │
 └───────────────────────────┘
-▲
-│ (self-relation)
-▼
+ ▲
+ │ (self-relation)
+ ▼
 
 ┌───────────────────────────┐
-│ USER │
+│ USER                      │
 ├───────────────────────────┤
-│ id (PK) │
-│ username (unique) │
-│ password │
+│ id (PK)                   │
+│ username (unique)         │
+│ password                  │
 │ role (enum: Owner/Admin/Viewer) │
-│ organizationId (FK) │
+│ organizationId (FK)       │
 ├───────────────────────────┤
-│ 1 ──< tasks │
+│ 1 ──< tasks               │
 └───────────────────────────┘
 │
 ▼
 
 ┌───────────────────────────┐
-│ TASK │
+│ TASK                      │
 ├───────────────────────────┤
-│ id (PK) │
-│ title │
-│ description (nullable) │
+│ id (PK)                   │
+│ title                     │
+│ description (nullable)    │
 │ status (enum: Pending/InProgress/Completed) │
-│ ownerId (FK → User.id) │
+│ ownerId (FK → User.id)    │
 └───────────────────────────┘
 
 ┌───────────────────────────┐
-│ ROLE │
+│ ROLE                      │
 ├───────────────────────────┤
-│ id (PK) │
-│ name (Owner/Admin/Viewer)│
-│ permissions (string[]) │
+│ id (PK)                   │
+│ name (Owner/Admin/Viewer) │
+│ permissions (string[])    │
 └───────────────────────────┘
 
 Organization → User: One-to-Many
@@ -161,7 +161,7 @@ User → Task: One-to-Many
 
 Roles assigned at the User level dictate access to Tasks within their Organization.
 
-4. Access Control Implementation
+## 4. Access Control Implementation
    Roles & Permissions
 
 Admin: Full access to all tasks in the org and sub-orgs.
@@ -184,7 +184,7 @@ On each request, middleware validates the token and injects user info into reque
 
 Permissions are checked against roles and organization hierarchy.
 
-5. API Documentation
+## 5. API Documentation
    Authentication
 
 POST /auth/login
@@ -229,7 +229,7 @@ Response
 "task": { ... }
 }
 
-6. Future Considerations
+## 6. Future Considerations
 
 Customizable Dashboards: Users can filter or arrange task columns.
 
